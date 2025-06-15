@@ -4,7 +4,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable
-COPY . /app
+COPY apps/api /app
 WORKDIR /app
 
 FROM base AS prod-deps
@@ -15,7 +15,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install && pnpm run build
 
 # Install Go
 FROM golang:1.24 AS go-base
-COPY sharedLibs/go-html-to-md /app/sharedLibs/go-html-to-md
+COPY apps/api/sharedLibs/go-html-to-md /app/sharedLibs/go-html-to-md
 
 # Install Go dependencies and build parser lib
 RUN cd /app/sharedLibs/go-html-to-md && \
@@ -25,8 +25,8 @@ RUN cd /app/sharedLibs/go-html-to-md && \
 
 # Install Rust
 FROM rust:1-slim AS rust-base
-COPY sharedLibs/html-transformer /app/sharedLibs/html-transformer
-COPY sharedLibs/pdf-parser /app/sharedLibs/pdf-parser
+COPY apps/api/sharedLibs/html-transformer /app/sharedLibs/html-transformer
+COPY apps/api/sharedLibs/pdf-parser /app/sharedLibs/pdf-parser
 
 # Install Rust dependencies and build transformer lib
 RUN cd /app/sharedLibs/html-transformer && \
@@ -54,4 +54,4 @@ EXPOSE 8080
 # Make sure the entrypoint script has the correct line endings
 RUN sed -i 's/\r$//' /app/docker-entrypoint.sh
 
-ENTRYPOINT "/app/docker-entrypoint.sh"
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

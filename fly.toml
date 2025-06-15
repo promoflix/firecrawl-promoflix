@@ -1,0 +1,28 @@
+# fly.toml app configuration file generated for firecrawl-promoflix on 2025-06-15T19:34:26+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'firecrawl-promoflix'
+primary_region = 'bos'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[env]
+  HOST = "0.0.0.0"
+  PORT = "8080"
+  USE_DB_AUTHENTICATION = "false"
+
+[build]
+  dockerfile = 'apps/api/Dockerfile'
